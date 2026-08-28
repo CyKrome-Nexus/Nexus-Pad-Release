@@ -1,0 +1,806 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nexus Pad. Paste text. Run the right script.</title>
+<meta name="description" content="Nexus Pad is a fast desktop scratchpad for text transforms, JSON, Markdown, JWTs, and custom scripts. Built with Tauri for macOS, Windows, and Linux.">
+<meta property="og:title" content="Nexus Pad">
+<meta property="og:description" content="A quiet scratchpad for text transforms, custom scripts, JSON, Markdown, and JWTs.">
+<meta property="og:type" content="website">
+<link rel="icon" href="app-icon.png" type="image/png">
+<link rel="apple-touch-icon" href="app-icon.png">
+<style>
+:root{
+  --bg:#0d1117;
+  --bg2:#111827;
+  --panel:#161b22;
+  --panel2:#0f172a;
+  --line:rgba(148,163,184,.16);
+  --line2:rgba(148,163,184,.24);
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+  --muted2:#6b7280;
+  --accent:#3b82f6;
+  --accent2:#8b5cf6;
+  --success:#22c55e;
+  --warning:#f59e0b;
+  --shadow:0 20px 60px rgba(0,0,0,.38);
+  --wrap:1160px;
+  --sans:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:"Iowan Old Style",Palatino,"Palatino Linotype",Georgia,serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:linear-gradient(180deg,var(--bg),#090d14 58%,#070b12);
+  color:var(--text);
+  font:400 16px/1.6 var(--sans);
+  overflow-x:hidden;
+}
+a{color:inherit}
+p{margin:0}
+h1,h2,h3{margin:0; line-height:1.05; letter-spacing:-.04em}
+code,kbd{font-family:var(--mono)}
+.wrap{max-width:var(--wrap); margin:0 auto; padding:0 24px}
+.eyebrow{
+  display:inline-flex; align-items:center; gap:8px;
+  font:600 11px/1 var(--mono); letter-spacing:.16em; text-transform:uppercase;
+  color:var(--accent); margin-bottom:14px;
+}
+.eyebrow::before{content:""; width:18px; height:1px; background:color-mix(in srgb,var(--accent) 70%, transparent)}
+
+.aurora{position:fixed; inset:-28vh -18vw; z-index:-2; pointer-events:none; filter:blur(74px); opacity:.5}
+.aurora span{position:absolute; border-radius:50%; mix-blend-mode:screen; will-change:transform}
+.aurora span:nth-child(1){width:48vw;height:48vw;left:-4vw;top:1vh;background:radial-gradient(circle,rgba(59,130,246,.62),transparent 68%);animation:drift1 28s ease-in-out infinite}
+.aurora span:nth-child(2){width:42vw;height:42vw;right:-5vw;top:-4vh;background:radial-gradient(circle,rgba(139,92,246,.46),transparent 68%);animation:drift2 34s ease-in-out infinite}
+.aurora span:nth-child(3){width:36vw;height:36vw;left:34vw;top:44vh;background:radial-gradient(circle,rgba(245,158,11,.24),transparent 70%);animation:drift3 40s ease-in-out infinite}
+@keyframes drift1{50%{transform:translate3d(10vw,9vh,0) scale(1.14)}}
+@keyframes drift2{50%{transform:translate3d(-12vw,12vh,0) scale(.9)}}
+@keyframes drift3{50%{transform:translate3d(7vw,-12vh,0) scale(1.08)}}
+.mesh{
+  position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:
+    linear-gradient(rgba(148,163,184,.08) 1px,transparent 1px) 0 0/64px 64px,
+    linear-gradient(90deg,rgba(148,163,184,.08) 1px,transparent 1px) 0 0/64px 64px;
+  opacity:.42;
+  mask-image:radial-gradient(ellipse 90% 62% at 50% 0%,#000 18%,transparent 78%);
+  animation:grid 44s linear infinite;
+}
+@keyframes grid{to{background-position:64px 64px,64px 64px}}
+
+header{
+  position:sticky; top:0; z-index:20;
+  backdrop-filter:blur(16px) saturate(1.3);
+  background:color-mix(in srgb,var(--bg) 72%, transparent);
+  border-bottom:1px solid transparent;
+}
+header.stuck{border-bottom-color:var(--line)}
+.bar{display:flex; align-items:center; gap:24px; min-height:68px}
+.brand{display:flex; align-items:center; gap:12px; text-decoration:none; font-weight:700; letter-spacing:-.03em}
+.mark{
+  width:34px; height:34px; border-radius:10px;
+  display:block; object-fit:cover; flex:none;
+}
+.mark.large{width:44px; height:44px; border-radius:12px}
+nav{display:flex; gap:22px; margin-left:auto; font-size:14px}
+nav a{text-decoration:none; color:var(--muted); transition:color .2s}
+nav a:hover{color:var(--text)}
+@media (max-width:880px){nav{display:none}}
+@media (max-width:440px){
+  .wrap{padding-inline:16px}
+  .bar{gap:10px; min-height:60px}
+  header .btn.sm{display:none}
+}
+
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  text-decoration:none; border-radius:12px; padding:12px 18px;
+  border:1px solid var(--line2); background:rgba(255,255,255,.02);
+  transition:transform .18s ease, border-color .18s ease, background .18s ease;
+  font:600 14px/1 var(--sans); white-space:nowrap;
+}
+.btn:hover{transform:translateY(-2px); border-color:rgba(59,130,246,.42); background:rgba(255,255,255,.05)}
+.btn.primary{
+  border-color:transparent;
+  background:linear-gradient(180deg,rgba(59,130,246,1),rgba(37,99,235,1));
+}
+.btn.sm{padding:10px 14px; font-size:13px}
+
+.hero{padding:84px 0 60px}
+.hero-grid{display:grid; grid-template-columns:1.05fr .95fr; gap:42px; align-items:center}
+.hero-grid > *{min-width:0}
+@media (max-width:960px){.hero-grid{grid-template-columns:1fr; gap:28px}}
+.badge{
+  display:inline-flex; align-items:center; gap:10px; flex-wrap:wrap;
+  border:1px solid var(--line); background:rgba(255,255,255,.03);
+  border-radius:999px; padding:7px 12px 7px 8px;
+  color:var(--muted); font-size:13px;
+}
+.badge b{
+  font:700 11px/1 var(--mono); letter-spacing:.12em; text-transform:uppercase;
+  color:#dbeafe; background:rgba(59,130,246,.18); padding:5px 8px; border-radius:999px;
+}
+.hero-brand{
+  display:flex; align-items:center; gap:14px;
+}
+.hero-brand .mark{
+  width:72px; height:72px; border-radius:18px;
+}
+.hero-brand .name{
+  display:block;
+  font-family:var(--serif);
+  font-size:clamp(52px,7vw,88px);
+  font-weight:700;
+  letter-spacing:-.06em;
+  line-height:.95;
+}
+.hero-brand .tag{
+  display:block;
+  margin-top:8px;
+  color:var(--muted);
+  font-size:15px;
+  letter-spacing:0;
+  text-transform:none;
+  font-family:var(--sans);
+}
+.hero h1{
+  margin-top:18px;
+  font-family:var(--serif);
+  font-size:clamp(34px,4vw,48px);
+  font-weight:700;
+  letter-spacing:-.05em;
+}
+.hero h1 span{
+  display:block;
+  background:linear-gradient(180deg,#fff 18%,#bfd7ff 70%,#7dd3fc);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.lede{margin-top:18px; max-width:62ch; color:var(--muted); font-size:clamp(17px,1.6vw,19px)}
+.cta{display:flex; gap:12px; flex-wrap:wrap; margin-top:30px}
+.meta{
+  margin-top:14px; color:var(--muted2); font:500 13px/1.4 var(--mono);
+}
+@media (max-width:720px){
+  .hero{padding:64px 16px 42px}
+  .hero-grid{display:block}
+  .mock{margin-top:22px}
+  .hero-brand{
+    align-items:flex-start;
+    gap:12px;
+    flex-direction:column;
+    max-width:calc(100% - 8px);
+  }
+  .hero-brand .mark{width:58px; height:58px; border-radius:16px}
+  .hero-brand .name{font-size:clamp(40px,13vw,58px); line-height:1}
+  .hero-brand .tag{font-size:14px; margin-top:6px}
+  .hero h1{
+    font-size:clamp(28px,8vw,38px);
+    max-width:calc(100% - 8px);
+  }
+  .lede{
+    font-size:16px;
+    max-width:calc(100% - 8px);
+  }
+  .cta{flex-direction:column; align-items:stretch}
+  .cta .btn{width:100%}
+  .meta{font-size:12px; line-height:1.5}
+}
+
+.mock{
+  border:1px solid var(--line2);
+  background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01)), var(--panel);
+  border-radius:18px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  max-width:100%;
+}
+.titlebar{
+  display:flex; align-items:center; gap:10px;
+  padding:10px 14px; background:rgba(255,255,255,.02);
+  border-bottom:1px solid var(--line);
+  font-size:12px; color:var(--muted);
+}
+.lights{display:flex; gap:6px}
+.lights i{width:10px; height:10px; border-radius:50%; display:block}
+.lights i:nth-child(1){background:#ef4444}
+.lights i:nth-child(2){background:#f59e0b}
+.lights i:nth-child(3){background:#22c55e}
+.mock-body{display:grid; grid-template-columns:184px 1fr; min-height:420px}
+@media (max-width:740px){.mock-body{grid-template-columns:1fr; min-height:auto}.drawer{display:none}}
+@media (max-width:440px){
+  .mock{border-radius:14px}
+  .titlebar{padding:9px 10px}
+  .titlebar span{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .main{padding:10px}
+  .topline{gap:8px}
+  .send{padding-inline:12px}
+  .tabs{gap:12px; overflow-x:auto}
+  .result{padding:12px; font-size:11.5px}
+}
+.drawer{
+  border-right:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(15,23,42,.95),rgba(17,24,39,.92));
+  padding:12px 10px;
+}
+.drawer .group{font:600 10px/1 var(--mono); letter-spacing:.14em; text-transform:uppercase; color:var(--muted2); padding:10px 8px 8px}
+.row{
+  display:flex; align-items:center; gap:8px;
+  padding:8px 8px; border-radius:8px; color:var(--muted); font-size:13px;
+}
+.row.active{background:rgba(59,130,246,.12); color:#dbeafe}
+.pill{
+  width:28px; flex:none; font:700 10px/1 var(--mono); letter-spacing:.08em;
+  color:var(--muted2);
+}
+.pill.blue{color:#93c5fd}
+.pill.green{color:var(--success)}
+.pill.amber{color:var(--warning)}
+.main{padding:14px; min-width:0}
+.topline{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+.topline > *{min-width:0}
+.method{
+  font:700 11px/1 var(--mono); letter-spacing:.08em; text-transform:uppercase;
+  padding:7px 9px; border-radius:8px; color:#dbeafe;
+  background:rgba(59,130,246,.16); border:1px solid rgba(59,130,246,.24);
+}
+.buffer{
+  flex:1; min-width:0;
+  padding:11px 12px; border-radius:10px;
+  background:rgba(15,23,42,.92); border:1px solid var(--line);
+  font:400 12px/1.7 var(--mono); color:#cbd5e1;
+  overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+}
+.buffer b{color:#f8fafc}
+.send{
+  padding:10px 16px; border-radius:10px;
+  background:linear-gradient(180deg,rgba(59,130,246,1),rgba(37,99,235,1));
+  font:700 12px/1 var(--sans); color:white;
+}
+.tabs{display:flex; gap:18px; margin-top:14px; border-bottom:1px solid var(--line)}
+.tabs span{padding-bottom:10px; color:var(--muted2); font-size:12px}
+.tabs .on{color:#f8fafc; box-shadow:inset 0 -2px 0 var(--accent)}
+.result{
+  margin-top:12px; padding:14px; border-radius:12px;
+  border:1px solid var(--line); background:rgba(15,23,42,.85);
+  font:400 12.5px/1.8 var(--mono); color:#dbeafe;
+}
+.result .k{color:#93c5fd}.result .s{color:#86efac}.result .n{color:#fca5a5}
+.chips{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px}
+.chip{
+  padding:6px 10px; border-radius:999px; font:600 11px/1 var(--mono);
+  background:rgba(255,255,255,.03); border:1px solid var(--line); color:var(--muted);
+}
+.chip.good{color:#86efac; border-color:rgba(34,197,94,.22); background:rgba(34,197,94,.08)}
+@media (max-width:440px){
+  .main{padding:10px}
+  .topline .buffer{flex-basis:calc(100% - 74px)}
+}
+
+.marquee{margin:38px 0 0; padding:18px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); overflow:hidden}
+.track{display:flex; gap:30px; width:max-content; animation:slide 30s linear infinite}
+.track span{font:600 12px/1 var(--mono); letter-spacing:.14em; text-transform:uppercase; color:var(--muted2); white-space:nowrap}
+@keyframes slide{to{transform:translateX(-50%)}}
+
+section{padding:92px 0}
+.section-head{max-width:720px; margin-bottom:30px}
+.section-head h2{
+  font-family:var(--serif); font-size:clamp(30px,4.2vw,54px);
+  font-weight:700; letter-spacing:-.05em;
+}
+.section-head p{margin-top:14px; color:var(--muted); font-size:17px}
+
+.grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px}
+.card{
+  position:relative; overflow:hidden;
+  padding:22px 20px; border-radius:16px;
+  border:1px solid var(--line); background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.015));
+  min-height:170px; transition:transform .22s ease, border-color .22s ease;
+}
+.card:hover{transform:translateY(-3px); border-color:rgba(59,130,246,.34)}
+.card::before{
+  content:""; position:absolute; inset:0; opacity:0; transition:opacity .22s ease; pointer-events:none;
+  background:radial-gradient(340px circle at var(--mx,50%) var(--my,50%),rgba(59,130,246,.14),transparent 70%);
+}
+.card:hover::before{opacity:1}
+.card > *{position:relative}
+.card h3{display:flex; align-items:center; gap:10px; font-size:17px; margin-bottom:10px}
+.icon{
+  width:32px; height:32px; display:grid; place-items:center; border-radius:10px;
+  background:rgba(59,130,246,.12); color:#bfdbfe; flex:none;
+}
+.card p{color:var(--muted); font-size:14.5px}
+
+.split{display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:start}
+@media (max-width:900px){.split{grid-template-columns:1fr}}
+.flow,.notes{
+  border:1px solid var(--line); border-radius:18px;
+  background:rgba(255,255,255,.02);
+  padding:24px;
+}
+.flow .step{display:flex; align-items:center; gap:12px; padding:10px 0}
+.node{
+  padding:8px 12px; border-radius:10px; border:1px solid var(--line); background:rgba(255,255,255,.02);
+  color:#e2e8f0; font:600 12px/1 var(--mono);
+}
+.node.hot{border-color:rgba(59,130,246,.28); color:#dbeafe; background:rgba(59,130,246,.1)}
+.wire{flex:1; height:2px; border-radius:2px; background:rgba(148,163,184,.14); position:relative; overflow:hidden}
+.wire::after{
+  content:""; position:absolute; inset:0; width:34%;
+  background:linear-gradient(90deg,transparent,rgba(59,130,246,.95),transparent);
+  animation:pulse 2.5s linear infinite;
+}
+@keyframes pulse{from{transform:translateX(-100%)}to{transform:translateX(320%)}}
+.flow p{margin-top:10px; color:var(--muted2); font:500 12px/1.7 var(--mono)}
+.bullets{list-style:none; padding:0; margin:18px 0 0; display:grid; gap:12px}
+.bullets li{display:flex; gap:10px; color:var(--muted); font-size:15px}
+.bullets b{color:var(--text)}
+.tick{color:var(--success); flex:none}
+
+.stats{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(145px,1fr));
+  gap:1px; background:var(--line); border:1px solid var(--line); border-radius:16px; overflow:hidden;
+}
+.stat{background:rgba(255,255,255,.02); padding:24px 18px; text-align:center}
+.stat b{
+  display:block; font-size:34px; line-height:1; letter-spacing:-.05em;
+  background:linear-gradient(180deg,#fff,#bfdbfe);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.stat span{display:block; margin-top:8px; color:var(--muted2); font-size:13px}
+
+.download{
+  border:1px solid var(--line); border-radius:22px; padding:44px 30px;
+  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
+  box-shadow:var(--shadow);
+}
+@media (max-width:720px){
+  section{padding:64px 0}
+  .download{padding:28px 18px; border-radius:18px}
+  .section-head p{font-size:15px}
+}
+.platforms{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin-top:24px}
+.platforms a{
+  display:flex; flex-direction:column; gap:5px; text-decoration:none;
+  padding:16px 17px; border-radius:14px; border:1px solid var(--line2);
+  background:rgba(255,255,255,.02); transition:transform .18s ease, border-color .18s ease;
+}
+.platforms a:hover{transform:translateY(-2px); border-color:rgba(59,130,246,.36)}
+.platforms b{font-size:14px}
+.platforms i{font-style:normal; color:var(--muted2); font:400 11.5px/1 var(--mono)}
+.fineprint{margin-top:18px; color:var(--muted2); font-size:13px}
+.fineprint a{color:#bfdbfe; text-decoration:none}
+.dl-meta,.dl-alt{color:var(--muted2); font:500 13px/1.5 var(--mono)}
+.dl-meta{margin-top:14px}
+.dl-alt{margin-top:26px}
+
+footer{padding:34px 0 46px; border-top:1px solid var(--line)}
+.foot{display:flex; align-items:center; gap:18px; flex-wrap:wrap; color:var(--muted2); font-size:13px}
+.foot nav{display:flex; gap:16px; margin-left:auto}
+.foot a{text-decoration:none}
+.rv{opacity:0; transform:translateY(22px); transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
+.rv.in{opacity:1; transform:none}
+
+@media (max-width:520px){
+  .flow,.notes{padding:18px}
+  .flow .step{display:grid; grid-template-columns:1fr; gap:8px}
+  .wire{width:100%; min-height:2px}
+  .node{width:100%; text-align:center}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .platforms{grid-template-columns:1fr}
+  .foot nav{width:100%; margin-left:0}
+}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important; transition-duration:.01ms!important}
+  .rv{opacity:1; transform:none}
+}
+</style>
+</head>
+<body>
+<div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
+<div class="mesh" aria-hidden="true"></div>
+<header id="top">
+  <div class="wrap bar">
+    <a class="brand" href="#top">
+      <img class="mark" src="app-icon.png" alt="" aria-hidden="true">
+      Nexus Pad
+    </a>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="#workflow">Workflow</a>
+      <a href="#engine">Engine</a>
+      <a href="#download">Download</a>
+    </nav>
+    <a class="btn primary sm" href="#download">Get Nexus Pad</a>
+  </div>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-brand">
+          <img class="mark large" src="app-icon.png" alt="" aria-hidden="true">
+          <div>
+            <span class="name">Nexus Pad</span>
+            <span class="tag">Desktop scratchpad for text transforms</span>
+          </div>
+        </div>
+        <h1><span>Paste text.</span><span>Run the right script.</span></h1>
+        <p class="lede">
+          Nexus Pad is a desktop scratchpad for the work people actually do all day:
+          quick transforms, JSON reshaping, Markdown previews, JWT inspection, and custom scripts
+          that stay close to the editor instead of disappearing into a plugin maze.
+        </p>
+        <div class="cta">
+      <a class="btn primary" id="download-main" href="#download">Download Nexus Pad</a>
+          <a class="btn" href="#features">See the features</a>
+        </div>
+        <p class="meta">Tauri v2 · macOS, Windows, Linux · no account required</p>
+      </div>
+
+      <div class="mock" aria-label="Nexus Pad preview">
+        <div class="titlebar">
+          <div class="lights"><i></i><i></i><i></i></div>
+          <span>Nexus Pad · Scripts / Format JSON</span>
+        </div>
+        <div class="mock-body">
+          <aside class="drawer">
+            <div class="group">Tools</div>
+            <div class="row"><span class="pill blue">T</span>Plain Text</div>
+            <div class="row active"><span class="pill blue">J</span>JSON</div>
+            <div class="row"><span class="pill blue">M</span>Markdown</div>
+            <div class="row"><span class="pill blue">JWT</span>JWT</div>
+            <div class="group">Scripts</div>
+            <div class="row"><span class="pill green">⟳</span>Format JSON</div>
+            <div class="row"><span class="pill green">⇄</span>CSV to JSON</div>
+            <div class="row"><span class="pill amber">★</span>Favorites</div>
+            <div class="row"><span class="pill blue">⌘K</span>Search tools</div>
+          </aside>
+          <div class="main">
+            <div class="topline">
+              <span class="method">Format</span>
+              <div class="buffer"><b>{</b> "user": "Ada", "status": "ready", "items": [1, 2, 3] <b>}</b></div>
+              <span class="send">Run</span>
+            </div>
+            <div class="tabs"><span class="on">Editor</span><span>Find</span><span>Stats</span><span>Tabs</span></div>
+            <div class="result">
+              <span class="k">"status"</span>: <span class="s">"ready"</span><br>
+              <span class="k">"items"</span>: [<span class="n">1</span>, <span class="n">2</span>, <span class="n">3</span>]<br>
+              <span class="k">"normalized"</span>: <span class="s">true</span>
+            </div>
+            <div class="chips">
+              <span class="chip good">71 built-in scripts</span>
+              <span class="chip">Markdown preview</span>
+              <span class="chip">JWT decode / encode</span>
+              <span class="chip">Custom script folder</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="track">
+      <span>Plain Text</span><span>JSON</span><span>Markdown</span><span>JWT</span><span>Tabs</span>
+      <span>Custom scripts</span><span>Search</span><span>Preferences</span><span>Shortcuts</span>
+      <span>Plain Text</span><span>JSON</span><span>Markdown</span><span>JWT</span><span>Tabs</span>
+      <span>Custom scripts</span><span>Search</span><span>Preferences</span><span>Shortcuts</span>
+    </div>
+  </div>
+
+  <section id="features" class="wrap">
+    <div class="section-head rv">
+      <div class="eyebrow">What it does</div>
+      <h2>The whole scratchpad, organized around the text.</h2>
+      <p>
+        Nexus Pad is not a general-purpose suite. It is a focused desk for the transformations
+        that keep showing up: open text, run a script, inspect the result, keep moving.
+      </p>
+    </div>
+    <div class="grid">
+      <div class="card rv">
+        <h3><span class="icon">↔</span>Permanent drawer</h3>
+        <p>The left rail keeps tools and scripts visible, searchable, and one click away. Recents, favorites, and the full library all stay in reach.</p>
+      </div>
+      <div class="card rv">
+        <h3><span class="icon">□</span>Plain text editor</h3>
+        <p>The center pane stays simple: paste, edit, transform, and keep the native undo stack intact while scripts rewrite the buffer.</p>
+      </div>
+      <div class="card rv">
+        <h3><span class="icon">{}</span>JSON screen</h3>
+        <p>Format, minify, expand, collapse, compare, and switch between tree, text, and type views without leaving the document.</p>
+      </div>
+      <div class="card rv">
+        <h3><span class="icon">¶</span>Markdown preview</h3>
+        <p>Write on the left, preview on the right. The sandboxed iframe keeps the rendered output isolated and predictable.</p>
+      </div>
+      <div class="card rv">
+        <h3><span class="icon">◌</span>JWT tools</h3>
+        <p>Decode and encode tokens, inspect the signature state, switch claim layouts, and keep secrets and timestamps close to the token itself.</p>
+      </div>
+      <div class="card rv">
+        <h3><span class="icon">⌘</span>Keyboard-first flow</h3>
+        <p>Search, scripts, tabs, and screens are built around shortcuts so the hands stay on the keyboard when the job is repetitive.</p>
+      </div>
+      <div class="card rv">
+        <h3><span class="icon">★</span>Favorites and recents</h3>
+        <p>Frequently used scripts rise to the top. Star the ones you trust and the drawer becomes a personalized toolbox instead of a long list.</p>
+      </div>
+      <div class="card rv">
+        <h3><span class="icon">⚙</span>Preferences window</h3>
+        <p>Theme, syntax palette, scripts folder, and shortcut bindings all live in a dedicated settings window instead of cluttering the editor.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="workflow" class="wrap">
+    <div class="section-head rv">
+      <div class="eyebrow">Workflow</div>
+      <h2>Drawer, editor, screens, scripts. Everything stays close.</h2>
+      <p>Nexus Pad keeps the work visible instead of hiding it behind menus. You can browse scripts from the drawer, transform the current buffer in the editor, and switch to a focused screen only when the content calls for it.</p>
+    </div>
+    <div class="split">
+      <div class="flow rv">
+        <div class="step"><span class="node">Paste text</span><span class="wire"></span><span class="node hot">Editor buffer</span></div>
+        <div class="step"><span class="node hot">Pick a script</span><span class="wire"></span><span class="node">Transform result</span></div>
+        <div class="step"><span class="node">Open a screen</span><span class="wire"></span><span class="node hot">JSON, Markdown, JWT</span></div>
+        <div class="step"><span class="node hot">Tune settings</span><span class="wire"></span><span class="node">Theme, palette, shortcuts</span></div>
+        <p>That is the loop the release is built for: inspect the text, transform it, switch tools only when needed, and keep moving without losing the buffer.</p>
+      </div>
+      <div class="notes rv">
+        <div class="eyebrow">Included in this release</div>
+        <ul class="bullets" style="margin-top:0">
+          <li><span class="tick">✓</span><span><b>71 built-in scripts.</b> Format, convert, encode, decode, clean up, and normalize common text tasks.</span></li>
+          <li><span class="tick">✓</span><span><b>JSON screen.</b> Tree view, compare mode, expand/collapse, and format/minify controls in one place.</span></li>
+          <li><span class="tick">✓</span><span><b>Markdown and JWT tools.</b> Preview Markdown live and inspect JWTs without leaving the app.</span></li>
+          <li><span class="tick">✓</span><span><b>Custom scripts folder.</b> Point Nexus Pad at your own script directory and it joins the drawer.</span></li>
+          <li><span class="tick">✓</span><span><b>Preferences window.</b> Keep theme, syntax palette, shortcut bindings, and update settings separate from the editor.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="engine" class="wrap">
+    <div class="section-head rv">
+      <div class="eyebrow">Engine</div>
+      <h2>Built like the app: Tauri on top, native work underneath.</h2>
+      <p>
+        Nexus Pad keeps the webview light. Scripts run off the main thread, the editor stays undo-safe,
+        and the Rust side handles the native pieces the browser should not own.
+      </p>
+    </div>
+    <div class="stats rv">
+      <div class="stat"><b>4</b><span>screens</span></div>
+      <div class="stat"><b>71</b><span>built-in scripts</span></div>
+      <div class="stat"><b>2</b><span>windows</span></div>
+      <div class="stat"><b>1</b><span>shared state store</span></div>
+      <div class="stat"><b>0</b><span>frameworks</span></div>
+    </div>
+    <div class="split" style="margin-top:28px">
+      <div class="flow rv">
+        <div class="step"><span class="node">Webview UI</span><span class="wire"></span><span class="node hot">Worker</span></div>
+        <div class="step"><span class="node hot">Worker</span><span class="wire"></span><span class="node">Text transform</span></div>
+        <div class="step"><span class="node">Tauri</span><span class="wire"></span><span class="node hot">Native menu / files</span></div>
+        <p>That split keeps big scripts from freezing the editor and lets the release builds stay lean.</p>
+      </div>
+      <div class="notes rv">
+        <div class="eyebrow">Honest scope</div>
+        <p style="color:var(--muted); font-size:15px">
+          Nexus Pad is proud of what it already does: editor transforms, JSON tools, Markdown preview,
+          JWT handling, shortcuts, and custom scripts. The homepage says that clearly instead of pretending
+          the app is a generic platform.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="download" class="wrap">
+    <div class="download rv">
+      <div class="eyebrow">Get it</div>
+      <h2 style="font-family:var(--serif); font-size:clamp(30px,4vw,48px); letter-spacing:-.05em">Download Nexus Pad</h2>
+      <p style="margin-top:14px; max-width:70ch; color:var(--muted)">
+        Grab the latest signed release from GitHub. This repository intentionally stays release-only:
+        installers, update metadata, and checksums live here, while the source stays in the private app repo.
+      </p>
+      <div class="cta" style="margin-top:26px">
+        <a class="btn primary" id="download-release" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>
+          <span id="download-release-label">Open latest release</span>
+        </a>
+      </div>
+      <p class="dl-meta" id="download-meta">Latest release · macOS, Windows and Linux builds</p>
+      <p class="dl-alt">Not your platform?</p>
+      <div class="platforms">
+        <a data-dl="mac-arm" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>
+          <b>macOS · Apple Silicon</b><i>.dmg</i>
+        </a>
+        <a data-dl="mac-x64" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>
+          <b>macOS · Intel</b><i>.dmg</i>
+        </a>
+        <a data-dl="win" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>
+          <b>Windows</b><i>.msi or setup.exe</i>
+        </a>
+        <a data-dl="linux" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>
+          <b>Linux</b><i>.AppImage, .deb, .rpm</i>
+        </a>
+      </div>
+      <p class="fineprint">
+        Also available:
+        <a data-dl="win-msi" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>Windows .msi</a> ·
+        <a data-dl="deb" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>Debian .deb</a> ·
+        <a data-dl="rpm" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>Fedora .rpm</a> ·
+        <a href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest">all files and checksums</a>
+        <br><br>
+        Updates are verified by the installed app before they apply. For the source code, development guide,
+        and custom scripts, use the private app repository and its docs.
+      </p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <a class="brand" href="#top">
+      <img class="mark" src="app-icon.png" alt="" aria-hidden="true" style="width:28px;height:28px;border-radius:9px">
+      Nexus Pad
+    </a>
+    <span>© <span id="yr">2026</span> CyKrome Nexus</span>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="#workflow">Workflow</a>
+      <a href="#download">Download</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+document.getElementById("yr").textContent = new Date().getFullYear();
+
+const header = document.querySelector("header");
+addEventListener("scroll", () => header.classList.toggle("stuck", scrollY > 12), { passive: true });
+
+const io = "IntersectionObserver" in window && new IntersectionObserver((entries) => {
+  for (const entry of entries) {
+    if (!entry.isIntersecting) continue;
+    entry.target.classList.add("in");
+    io.unobserve(entry.target);
+  }
+}, { rootMargin: "0px 0px -12% 0px" });
+document.querySelectorAll(".rv").forEach((el, i) => {
+  el.style.transitionDelay = `${(i % 3) * 70}ms`;
+  if (io) io.observe(el);
+  else el.classList.add("in");
+});
+
+for (const card of document.querySelectorAll(".card")) {
+  card.addEventListener("pointermove", (event) => {
+    const rect = card.getBoundingClientRect();
+    card.style.setProperty("--mx", `${event.clientX - rect.left}px`);
+    card.style.setProperty("--my", `${event.clientY - rect.top}px`);
+  });
+}
+
+const repo = "CyKrome-Nexus/Nexus-Pad-Release";
+const releaseUrl = `https://github.com/${repo}/releases/latest`;
+const mainCta = document.getElementById("download-main");
+const releaseCta = document.getElementById("download-release");
+const releaseLabel = document.getElementById("download-release-label");
+const downloadMeta = document.getElementById("download-meta");
+const assetMap = {
+  "mac-arm": [/_aarch64\.dmg$/, "Mac Apple Silicon"],
+  "mac-x64": [/_x64\.dmg$/, "Mac Intel"],
+  win: [/x64-setup\.exe$/, "Windows"],
+  "win-msi": [/x64_en-US\.msi$/, "Windows .msi"],
+  linux: [/\.AppImage$/, "Linux"],
+  deb: [/\.deb$/, "Debian .deb"],
+  rpm: [/\.rpm$/, "Fedora .rpm"],
+};
+
+function detectPlatform() {
+  const ua = navigator.userAgent;
+  if (/Windows|Win64|WOW64/.test(ua)) return "win";
+  if (/Android/.test(ua)) return null;
+  if (/Mac|iPhone|iPad/.test(ua)) return isAppleSilicon() ? "mac-arm" : "mac-x64";
+  if (/Linux|X11/.test(ua)) return "linux";
+  return null;
+}
+
+function isAppleSilicon() {
+  try {
+    const gl = document.createElement("canvas").getContext("webgl");
+    const debug = gl && gl.getExtension("WEBGL_debug_renderer_info");
+    const renderer = debug ? gl.getParameter(debug.UNMASKED_RENDERER_WEBGL) : "";
+    return /Apple\s*(M\d|GPU)/i.test(renderer);
+  } catch {
+    return navigator.maxTouchPoints > 1;
+  }
+}
+
+const mb = (bytes) => `${(bytes / 1048576).toFixed(1)} MB`;
+const cacheKey = "nexus-pad.latest";
+const cacheTtl = 6 * 3600 * 1000;
+
+function readCache() {
+  try {
+    const cached = JSON.parse(localStorage.getItem(cacheKey) || "null");
+    return cached && Array.isArray(cached.files) ? cached : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeCache(release) {
+  try {
+    localStorage.setItem(cacheKey, JSON.stringify(release));
+  } catch {
+    /* Storage can be unavailable in private browsing. */
+  }
+}
+
+function toRelease(json) {
+  return {
+    at: Date.now(),
+    ver: json.tag_name || "",
+    files: (json.assets || [])
+      .filter((asset) => !asset.name.endsWith(".sig"))
+      .map((asset) => ({ name: asset.name, url: asset.browser_download_url, size: asset.size })),
+  };
+}
+
+async function resolveDownloads() {
+  const platform = detectPlatform();
+  if (platform && mainCta) mainCta.textContent = `Download for ${assetMap[platform][1]}`;
+  if (platform && releaseLabel) releaseLabel.textContent = `Download for ${assetMap[platform][1]}`;
+
+  const apply = (release) => {
+    const pick = (key) => release.files.find((file) => assetMap[key][0].test(file.name));
+
+    for (const link of document.querySelectorAll("[data-dl]")) {
+      const file = pick(link.dataset.dl);
+      if (!file) continue;
+      link.href = file.url;
+      const detail = link.querySelector("i");
+      if (detail) detail.textContent = `${file.name} · ${mb(file.size)}`;
+      else link.title = `${file.name} · ${mb(file.size)}`;
+    }
+
+    const file = platform && pick(platform);
+    if (file) {
+      if (mainCta) mainCta.href = file.url;
+      if (releaseCta) releaseCta.href = file.url;
+      if (downloadMeta) downloadMeta.textContent = `${release.ver} · ${file.name} · ${mb(file.size)}`;
+    } else if (downloadMeta && release.ver) {
+      downloadMeta.textContent = `${release.ver} · macOS, Windows and Linux builds`;
+    }
+  };
+
+  const cached = readCache();
+  if (cached) apply(cached);
+  if (cached && Date.now() - cached.at < cacheTtl) return;
+
+  try {
+    const res = await fetch(`https://api.github.com/repos/${repo}/releases/latest`, {
+      headers: { Accept: "application/vnd.github+json" },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const release = toRelease(await res.json());
+    if (!release.files.length) throw new Error("no assets");
+    writeCache(release);
+    apply(release);
+  } catch {
+    if (mainCta) mainCta.href = releaseUrl;
+    if (releaseCta) releaseCta.href = releaseUrl;
+    if (!cached && downloadMeta) downloadMeta.textContent = "Latest release · pick your file on GitHub";
+  }
+}
+
+resolveDownloads();
+</script>
+</body>
+</html>
