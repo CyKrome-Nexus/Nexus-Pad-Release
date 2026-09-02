@@ -780,7 +780,7 @@ footer{padding:34px 0 46px; border-top:1px solid var(--line)}
       <h2 style="font-family:var(--serif); font-size:clamp(30px,4vw,48px); letter-spacing:-.05em">Get Nexus Pad</h2>
       <p style="margin-top:14px; max-width:70ch; color:var(--muted)">
         Run one command in your terminal to install Nexus Pad automatically on macOS and Linux,
-        or download a standalone installer for Windows and Linux distributions.
+        or download the Windows installer directly from the latest release.
       </p>
 
       <div class="install-tabs" role="tablist">
@@ -830,9 +830,7 @@ footer{padding:34px 0 46px; border-top:1px solid var(--line)}
         </div>
 
         <div class="install-sublinks">
-          Prefer a manual download?
-          <a data-dl="mac-arm" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>Apple Silicon .dmg</a> ·
-          <a data-dl="mac-x64" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>Intel .dmg</a>
+          This path is preferred until Apple Developer ID signing is configured, because it also removes the macOS quarantine attribute after install.
         </div>
       </div>
 
@@ -865,10 +863,7 @@ footer{padding:34px 0 46px; border-top:1px solid var(--line)}
         </div>
 
         <div class="install-sublinks">
-          Manual package downloads:
-          <a data-dl="linux" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>AppImage</a> ·
-          <a data-dl="deb" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>Debian / Ubuntu .deb</a> ·
-          <a data-dl="rpm" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>Fedora / RHEL .rpm</a>
+          This path is preferred because it installs the AppImage, menu entry, icon, and terminal command together.
         </div>
       </div>
 
@@ -893,11 +888,14 @@ footer{padding:34px 0 46px; border-top:1px solid var(--line)}
       <!-- All Downloads Panel -->
       <div class="tab-panel" id="panel-all" role="tabpanel">
         <div class="platforms">
-          <a data-dl="mac-arm" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>
-            <b>macOS · Apple Silicon</b><i>.dmg</i>
+          <a data-dl="install" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest/download/install.sh" download>
+            <b>Universal Installer</b><i>install.sh</i>
           </a>
-          <a data-dl="mac-x64" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>
-            <b>macOS · Intel</b><i>.dmg</i>
+          <a data-dl="install-mac" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest/download/install-mac.sh" download>
+            <b>macOS Installer</b><i>install-mac.sh</i>
+          </a>
+          <a data-dl="install-linux" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest/download/install-linux.sh" download>
+            <b>Linux Installer</b><i>install-linux.sh</i>
           </a>
           <a data-dl="win" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>
             <b>Windows Setup</b><i>x64 .exe</i>
@@ -905,22 +903,25 @@ footer{padding:34px 0 46px; border-top:1px solid var(--line)}
           <a data-dl="win-msi" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>
             <b>Windows Package</b><i>x64 .msi</i>
           </a>
-          <a data-dl="linux" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>
-            <b>Linux AppImage</b><i>universal .AppImage</i>
-          </a>
-          <a data-dl="deb" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>
-            <b>Debian / Ubuntu</b><i>.deb</i>
-          </a>
-          <a data-dl="rpm" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>
-            <b>Fedora / RHEL</b><i>.rpm</i>
-          </a>
         </div>
         <div class="install-sublinks" style="margin-top:20px">
           Universal auto-detect install script:
           <code>curl -fsSL https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest/download/install.sh | bash</code>
           <br><br>
-          <a href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest">View all releases, assets, and checksums on GitHub →</a>
+          <a href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest">View the full release on GitHub →</a>
         </div>
+        <!-- Backup direct-download grid. Re-enable after Apple Developer ID signing
+             is configured and macOS direct downloads no longer need a quarantine
+             workaround. Linux package links are kept here too so the visible flow
+             keeps users on the desktop-integration installer.
+        <div class="platforms">
+          <a data-dl="mac-arm" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download><b>macOS · Apple Silicon</b><i>.dmg</i></a>
+          <a data-dl="mac-x64" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download><b>macOS · Intel</b><i>.dmg</i></a>
+          <a data-dl="linux" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download><b>Linux AppImage</b><i>universal .AppImage</i></a>
+          <a data-dl="deb" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download><b>Debian / Ubuntu</b><i>.deb</i></a>
+          <a data-dl="rpm" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download><b>Fedora / RHEL</b><i>.rpm</i></a>
+        </div>
+        -->
       </div>
 
       <p class="fineprint">
@@ -1033,6 +1034,9 @@ const repo = "CyKrome-Nexus/Nexus-Pad-Release";
 const releaseUrl = `https://github.com/${repo}/releases/latest`;
 const mainCta = document.getElementById("download-main");
 const assetMap = {
+  install: [/install\.sh$/, "Universal installer"],
+  "install-mac": [/install-mac\.sh$/, "macOS installer"],
+  "install-linux": [/install-linux\.sh$/, "Linux installer"],
   "mac-arm": [/_aarch64\.dmg$/, "Mac Apple Silicon"],
   "mac-x64": [/_x64\.dmg$/, "Mac Intel"],
   win: [/x64-setup\.exe$/, "Windows"],
