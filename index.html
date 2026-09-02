@@ -362,7 +362,173 @@ section{padding:92px 0}
   .download{padding:28px 18px; border-radius:18px}
   .section-head p{font-size:15px}
 }
-.platforms{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin-top:24px}
+
+.install-tabs{
+  display:inline-flex;
+  gap:6px;
+  background:rgba(15,23,42,.8);
+  padding:5px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  margin-top:24px;
+  flex-wrap:wrap;
+}
+.tab-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:9px 16px;
+  border-radius:10px;
+  border:1px solid transparent;
+  background:transparent;
+  color:var(--muted);
+  font:600 13px/1 var(--sans);
+  cursor:pointer;
+  transition:all .18s ease;
+}
+.tab-btn:hover{
+  color:var(--text);
+  background:rgba(255,255,255,.04);
+}
+.tab-btn.active{
+  background:rgba(59,130,246,.15);
+  border-color:rgba(59,130,246,.35);
+  color:#dbeafe;
+}
+.tab-btn svg{
+  width:16px;
+  height:16px;
+  fill:currentColor;
+  flex:none;
+}
+
+.tab-panel{
+  display:none;
+  margin-top:22px;
+}
+.tab-panel.active{
+  display:block;
+  animation:fadeIn .25s ease;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+.terminal-card{
+  border:1px solid var(--line2);
+  border-radius:16px;
+  background:linear-gradient(180deg,#0e131d,#0a0d14);
+  box-shadow:0 12px 36px rgba(0,0,0,.45);
+  overflow:hidden;
+  position:relative;
+}
+.terminal-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 16px;
+  background:rgba(255,255,255,.03);
+  border-bottom:1px solid var(--line);
+  font:500 12px/1 var(--mono);
+  color:var(--muted2);
+}
+.terminal-bar-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.terminal-code{
+  padding:18px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  overflow-x:auto;
+}
+.terminal-cmd{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font:500 13.5px/1.6 var(--mono);
+  color:#f8fafc;
+  white-space:nowrap;
+}
+.terminal-cmd code{
+  user-select:all;
+}
+.terminal-prompt{
+  color:var(--accent);
+  font-weight:700;
+  user-select:none;
+}
+.btn-copy{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:8px 14px;
+  border-radius:10px;
+  border:1px solid var(--line2);
+  background:rgba(255,255,255,.04);
+  color:var(--text);
+  font:600 12px/1 var(--sans);
+  cursor:pointer;
+  flex:none;
+  transition:all .18s ease;
+}
+.btn-copy:hover{
+  border-color:rgba(59,130,246,.5);
+  background:rgba(59,130,246,.12);
+  color:#dbeafe;
+}
+.btn-copy.copied{
+  border-color:rgba(34,197,94,.5);
+  background:rgba(34,197,94,.15);
+  color:#86efac;
+}
+.btn-copy svg{
+  width:14px;
+  height:14px;
+  flex:none;
+}
+
+.install-perks{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px 24px;
+  margin-top:16px;
+}
+.install-perk{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  color:var(--muted);
+  font-size:13.5px;
+}
+.install-sublinks{
+  margin-top:18px;
+  color:var(--muted2);
+  font-size:13px;
+  line-height:1.7;
+}
+.install-sublinks a{
+  color:#93c5fd;
+  text-decoration:none;
+  border-bottom:1px dashed rgba(147,197,253,.4);
+  transition:border-color .15s;
+}
+.install-sublinks a:hover{
+  border-bottom-style:solid;
+  color:#dbeafe;
+}
+.install-sublinks code{
+  display:inline-block;
+  padding:2px 8px;
+  border-radius:6px;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--line);
+  font-size:12px;
+  color:#cbd5e1;
+}
+
+.platforms{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin-top:16px}
 .platforms a{
   display:flex; flex-direction:column; gap:5px; text-decoration:none;
   padding:16px 17px; border-radius:14px; border:1px solid var(--line2);
@@ -371,7 +537,7 @@ section{padding:92px 0}
 .platforms a:hover{transform:translateY(-2px); border-color:rgba(59,130,246,.36)}
 .platforms b{font-size:14px}
 .platforms i{font-style:normal; color:var(--muted2); font:400 11.5px/1 var(--mono)}
-.fineprint{margin-top:18px; color:var(--muted2); font-size:13px}
+.fineprint{margin-top:24px; color:var(--muted2); font-size:13px; line-height:1.7}
 .fineprint a{color:#bfdbfe; text-decoration:none}
 .dl-meta,.dl-alt{color:var(--muted2); font:500 13px/1.5 var(--mono)}
 .dl-meta{margin-top:14px}
@@ -383,6 +549,13 @@ footer{padding:34px 0 46px; border-top:1px solid var(--line)}
 .foot a{text-decoration:none}
 .rv{opacity:0; transform:translateY(22px); transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
 .rv.in{opacity:1; transform:none}
+
+@media (max-width:640px){
+  .terminal-code{flex-direction:column; align-items:flex-start; gap:12px}
+  .btn-copy{align-self:flex-start}
+  .install-tabs{width:100%}
+  .tab-btn{flex:1; justify-content:center}
+}
 
 @media (max-width:520px){
   .flow,.notes{padding:18px}
@@ -604,39 +777,153 @@ footer{padding:34px 0 46px; border-top:1px solid var(--line)}
   <section id="download" class="wrap">
     <div class="download rv">
       <div class="eyebrow">Get it</div>
-      <h2 style="font-family:var(--serif); font-size:clamp(30px,4vw,48px); letter-spacing:-.05em">Download Nexus Pad</h2>
+      <h2 style="font-family:var(--serif); font-size:clamp(30px,4vw,48px); letter-spacing:-.05em">Get Nexus Pad</h2>
       <p style="margin-top:14px; max-width:70ch; color:var(--muted)">
-        Grab the latest signed release from GitHub. This repository intentionally stays release-only:
-        installers, update metadata, and checksums live here, while the source stays in the private app repo.
+        Run one command in your terminal to install Nexus Pad automatically on macOS and Linux,
+        or download a standalone installer for Windows and Linux distributions.
       </p>
-      <div class="cta" style="margin-top:26px">
-        <a class="btn primary" id="download-release" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>
-          <span id="download-release-label">Open latest release</span>
-        </a>
+
+      <div class="install-tabs" role="tablist">
+        <button type="button" class="tab-btn active" data-tab="mac" role="tab" aria-selected="true">
+          <svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 3.5c.62-.75 1.04-1.8 0.93-2.85-.9.04-1.99.6-2.64 1.35-.58.65-1.09 1.71-.95 2.73 1 .08 2.03-.49 2.66-1.23z"/></svg>
+          macOS
+        </button>
+        <button type="button" class="tab-btn" data-tab="linux" role="tab" aria-selected="false">
+          <svg viewBox="0 0 24 24"><path d="M12.003 2c-2.8 0-4.004 2.197-4.004 4.8 0 .8.1 1.7.3 2.4C7.199 10 6.4 11.4 6.4 13.2c0 2.8 1.9 4.8 4.5 4.8.4 0 .8-.1 1.1-.2.3.1.7.2 1.1.2 2.6 0 4.5-2 4.5-4.8 0-1.8-.8-3.2-1.9-4 .2-.7.3-1.6.3-2.4 0-2.603-1.204-4.8-4.007-4.8zM9.5 7c.4 0 .7.3.7.8s-.3.7-.7.7-.7-.3-.7-.7.3-.8.7-.8zm5 0c.4 0 .7.3.7.8s-.3.7-.7.7-.7-.3-.7-.7.3-.8.7-.8z"/></svg>
+          Linux
+        </button>
+        <button type="button" class="tab-btn" data-tab="win" role="tab" aria-selected="false">
+          <svg viewBox="0 0 24 24"><path d="M3 5.48L10.53 4.4v7.08H3V5.48zm0 13.04l7.53 1.08v-7.08H3v6zm8.6-14.36L21 2.5v9H11.6V4.16zm9.4 17.34l-9.4-1.34v-8.68H21v10.02z"/></svg>
+          Windows
+        </button>
+        <button type="button" class="tab-btn" data-tab="all" role="tab" aria-selected="false">
+          All Downloads
+        </button>
       </div>
-      <p class="dl-meta" id="download-meta">Latest release · macOS, Windows and Linux builds</p>
-      <p class="dl-alt">Not your platform?</p>
-      <div class="platforms">
-        <a data-dl="mac-arm" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>
-          <b>macOS · Apple Silicon</b><i>.dmg</i>
-        </a>
-        <a data-dl="mac-x64" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>
-          <b>macOS · Intel</b><i>.dmg</i>
-        </a>
-        <a data-dl="win" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>
-          <b>Windows</b><i>.msi or setup.exe</i>
-        </a>
-        <a data-dl="linux" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>
-          <b>Linux</b><i>.AppImage, .deb, .rpm</i>
-        </a>
+
+      <!-- macOS Panel -->
+      <div class="tab-panel active" id="panel-mac" role="tabpanel">
+        <div class="terminal-card">
+          <div class="terminal-bar">
+            <div class="terminal-bar-left">
+              <div class="lights"><i></i><i></i><i></i></div>
+              <span>Terminal — Quick Install</span>
+            </div>
+            <span>bash</span>
+          </div>
+          <div class="terminal-code">
+            <div class="terminal-cmd">
+              <span class="terminal-prompt">$</span>
+              <code>curl -fsSL https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest/download/install-mac.sh | bash</code>
+            </div>
+            <button type="button" class="btn-copy" data-copy="curl -fsSL https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest/download/install-mac.sh | bash" aria-label="Copy macOS install command">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>Copy</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="install-perks">
+          <div class="install-perk"><span class="tick">✓</span> Installs directly into <b>/Applications</b></div>
+          <div class="install-perk"><span class="tick">✓</span> Auto-removes Gatekeeper quarantine</div>
+          <div class="install-perk"><span class="tick">✓</span> Apple Silicon (M1–M4) & Intel native</div>
+        </div>
+
+        <div class="install-sublinks">
+          Prefer a manual download?
+          <a data-dl="mac-arm" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>Apple Silicon .dmg</a> ·
+          <a data-dl="mac-x64" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>Intel .dmg</a>
+        </div>
       </div>
+
+      <!-- Linux Panel -->
+      <div class="tab-panel" id="panel-linux" role="tabpanel">
+        <div class="terminal-card">
+          <div class="terminal-bar">
+            <div class="terminal-bar-left">
+              <div class="lights"><i></i><i></i><i></i></div>
+              <span>Terminal — Quick Install</span>
+            </div>
+            <span>bash</span>
+          </div>
+          <div class="terminal-code">
+            <div class="terminal-cmd">
+              <span class="terminal-prompt">$</span>
+              <code>curl -fsSL https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest/download/install-linux.sh | bash</code>
+            </div>
+            <button type="button" class="btn-copy" data-copy="curl -fsSL https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest/download/install-linux.sh | bash" aria-label="Copy Linux install command">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>Copy</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="install-perks">
+          <div class="install-perk"><span class="tick">✓</span> Installs AppImage to <b>~/.local/share</b></div>
+          <div class="install-perk"><span class="tick">✓</span> Adds desktop application menu entry & icon</div>
+          <div class="install-perk"><span class="tick">✓</span> Symlinks <b>nexus-pad</b> CLI terminal command</div>
+        </div>
+
+        <div class="install-sublinks">
+          Manual package downloads:
+          <a data-dl="linux" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>AppImage</a> ·
+          <a data-dl="deb" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>Debian / Ubuntu .deb</a> ·
+          <a data-dl="rpm" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>Fedora / RHEL .rpm</a>
+        </div>
+      </div>
+
+      <!-- Windows Panel -->
+      <div class="tab-panel" id="panel-win" role="tabpanel">
+        <div class="cta" style="margin-top:0">
+          <a class="btn primary" id="download-win-main" data-dl="win" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 5.48L10.53 4.4v7.08H3V5.48zm0 13.04l7.53 1.08v-7.08H3v6zm8.6-14.36L21 2.5v9H11.6V4.16zm9.4 17.34l-9.4-1.34v-8.68H21v10.02z"/></svg>
+            <span>Download for Windows (setup.exe)</span>
+          </a>
+          <a class="btn" data-dl="win-msi" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>
+            <span>Windows MSI Package (.msi)</span>
+          </a>
+        </div>
+
+        <div class="install-perks" style="margin-top:20px">
+          <div class="install-perk"><span class="tick">✓</span> Windows 10 / 11 64-bit</div>
+          <div class="install-perk"><span class="tick">✓</span> Signed installer bundle with auto-updater</div>
+        </div>
+      </div>
+
+      <!-- All Downloads Panel -->
+      <div class="tab-panel" id="panel-all" role="tabpanel">
+        <div class="platforms">
+          <a data-dl="mac-arm" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>
+            <b>macOS · Apple Silicon</b><i>.dmg</i>
+          </a>
+          <a data-dl="mac-x64" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>
+            <b>macOS · Intel</b><i>.dmg</i>
+          </a>
+          <a data-dl="win" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>
+            <b>Windows Setup</b><i>x64 .exe</i>
+          </a>
+          <a data-dl="win-msi" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>
+            <b>Windows Package</b><i>x64 .msi</i>
+          </a>
+          <a data-dl="linux" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>
+            <b>Linux AppImage</b><i>universal .AppImage</i>
+          </a>
+          <a data-dl="deb" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>
+            <b>Debian / Ubuntu</b><i>.deb</i>
+          </a>
+          <a data-dl="rpm" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>
+            <b>Fedora / RHEL</b><i>.rpm</i>
+          </a>
+        </div>
+        <div class="install-sublinks" style="margin-top:20px">
+          Universal auto-detect install script:
+          <code>curl -fsSL https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest/download/install.sh | bash</code>
+          <br><br>
+          <a href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest">View all releases, assets, and checksums on GitHub →</a>
+        </div>
+      </div>
+
       <p class="fineprint">
-        Also available:
-        <a data-dl="win-msi" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>Windows .msi</a> ·
-        <a data-dl="deb" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>Debian .deb</a> ·
-        <a data-dl="rpm" href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest" download>Fedora .rpm</a> ·
-        <a href="https://github.com/CyKrome-Nexus/Nexus-Pad-Release/releases/latest">all files and checksums</a>
-        <br><br>
         Updates are verified by the installed app before they apply. For the source code, development guide,
         and custom scripts, use the private app repository and its docs.
       </p>
@@ -654,7 +941,7 @@ footer{padding:34px 0 46px; border-top:1px solid var(--line)}
     <nav>
       <a href="#features">Features</a>
       <a href="#workflow">Workflow</a>
-      <a href="#download">Download</a>
+      <a href="#download">Get Nexus Pad</a>
     </nav>
   </div>
 </footer>
@@ -686,12 +973,65 @@ for (const card of document.querySelectorAll(".card")) {
   });
 }
 
+// Platform tabs logic
+const tabButtons = document.querySelectorAll(".tab-btn");
+const tabPanels = document.querySelectorAll(".tab-panel");
+
+function selectTab(tabKey) {
+  tabButtons.forEach((btn) => {
+    const isActive = btn.dataset.tab === tabKey;
+    btn.classList.toggle("active", isActive);
+    btn.setAttribute("aria-selected", isActive ? "true" : "false");
+  });
+  tabPanels.forEach((panel) => {
+    panel.classList.toggle("active", panel.id === `panel-${tabKey}`);
+  });
+}
+
+tabButtons.forEach((btn) => {
+  btn.addEventListener("click", () => selectTab(btn.dataset.tab));
+});
+
+// Copy button logic
+document.querySelectorAll(".btn-copy").forEach((btn) => {
+  btn.addEventListener("click", async () => {
+    const text = btn.dataset.copy;
+    if (!text) return;
+    const span = btn.querySelector("span");
+    const oldText = span ? span.textContent : "";
+    const markCopied = () => {
+      btn.classList.add("copied");
+      if (span) span.textContent = "Copied!";
+      setTimeout(() => {
+        btn.classList.remove("copied");
+        if (span) span.textContent = oldText;
+      }, 2000);
+    };
+
+    try {
+      await navigator.clipboard.writeText(text);
+      markCopied();
+    } catch (err) {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+        markCopied();
+      } catch (e) {
+        console.error("Copy failed", e);
+      }
+      document.body.removeChild(ta);
+    }
+  });
+});
+
 const repo = "CyKrome-Nexus/Nexus-Pad-Release";
 const releaseUrl = `https://github.com/${repo}/releases/latest`;
 const mainCta = document.getElementById("download-main");
-const releaseCta = document.getElementById("download-release");
-const releaseLabel = document.getElementById("download-release-label");
-const downloadMeta = document.getElementById("download-meta");
 const assetMap = {
   "mac-arm": [/_aarch64\.dmg$/, "Mac Apple Silicon"],
   "mac-x64": [/_x64\.dmg$/, "Mac Intel"],
@@ -755,8 +1095,18 @@ function toRelease(json) {
 
 async function resolveDownloads() {
   const platform = detectPlatform();
-  if (platform && mainCta) mainCta.textContent = `Download for ${assetMap[platform][1]}`;
-  if (platform && releaseLabel) releaseLabel.textContent = `Download for ${assetMap[platform][1]}`;
+  if (platform) {
+    if (platform.startsWith("mac")) {
+      selectTab("mac");
+      if (mainCta) mainCta.textContent = "Install for macOS";
+    } else if (platform === "linux") {
+      selectTab("linux");
+      if (mainCta) mainCta.textContent = "Install for Linux";
+    } else if (platform === "win") {
+      selectTab("win");
+      if (mainCta) mainCta.textContent = "Download for Windows";
+    }
+  }
 
   const apply = (release) => {
     const pick = (key) => release.files.find((file) => assetMap[key][0].test(file.name));
@@ -770,13 +1120,12 @@ async function resolveDownloads() {
       else link.title = `${file.name} · ${mb(file.size)}`;
     }
 
-    const file = platform && pick(platform);
-    if (file) {
-      if (mainCta) mainCta.href = file.url;
-      if (releaseCta) releaseCta.href = file.url;
-      if (downloadMeta) downloadMeta.textContent = `${release.ver} · ${file.name} · ${mb(file.size)}`;
-    } else if (downloadMeta && release.ver) {
-      downloadMeta.textContent = `${release.ver} · macOS, Windows and Linux builds`;
+    const winFile = pick("win");
+    const winBtn = document.getElementById("download-win-main");
+    if (winFile && winBtn) {
+      winBtn.href = winFile.url;
+      const span = winBtn.querySelector("span");
+      if (span) span.textContent = `Download for Windows (${mb(winFile.size)})`;
     }
   };
 
@@ -794,9 +1143,7 @@ async function resolveDownloads() {
     writeCache(release);
     apply(release);
   } catch {
-    if (mainCta) mainCta.href = releaseUrl;
-    if (releaseCta) releaseCta.href = releaseUrl;
-    if (!cached && downloadMeta) downloadMeta.textContent = "Latest release · pick your file on GitHub";
+    /* fallback urls already set */
   }
 }
 
