@@ -1,0 +1,8 @@
+{
+  "slug": "nexus-pad",
+  "name": "Nexus Pad",
+  "description": "A fast desktop scratchpad for text transforms, JSON, Markdown, JWTs and custom scripts.",
+  "type": "application",
+  "icon": "app-icon.png",
+  "website": "https://nexuspad.cykrome.com"
+}
